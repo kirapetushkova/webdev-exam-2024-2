@@ -1,0 +1,87 @@
+{% macro form_book(book, genres) %}
+    <form method="POST" enctype="multipart/form-data">
+        <div class="mb-3">
+            <input type="text" class="form-control" placeholder="Заголовок" name="name" value="{{ book.name or '' }}" required>
+        </div>
+        <div class="mb-3">
+            <select class="form-select" name="genre" required>
+                {% for genre in genres %}
+                <option value="{{ genre.id }}" {% if book.genre_id == genre.id %}selected{% endif %}>{{ genre.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <input type="number" class="form-control" placeholder="Год написания" name="year" value="{{ book.year or '' }}" required>
+        </div>
+        <div class="mb-3">
+            <input type="text" class="form-control" placeholder="Автор" name="author" value="{{ book.author or '' }}" required>
+        </div>
+        <div class="mb-3">
+            <input type="number" class="form-control" placeholder="Объем в страницах" name="volume" value="{{ book.volume or '' }}" required>
+        </div>
+        <div class="mb-3">
+            <textarea class="form-control" placeholder="Описание" name="description" rows="3" required>{{ book.description or '' }}</textarea>
+        </div>
+        <div class="mb-3">
+            <input type="text" class="form-control" placeholder="Издательство" name="publishing" value="{{ book.publishing or '' }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="cover" class="form-label">Загрузить обложку</label>
+            <input class="form-control" type="file" name="cover" accept="image/*" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+    </form>
+{% endmacro %}
+
+{% macro form_edit_book(book, genres) %}
+    <form method="POST">
+        <div class="mb-3">
+            <input type="text" class="form-control" placeholder="Заголовок" name="name" value="{{ book.name or '' }}" required>
+        </div>
+        <div class="mb-3">
+            <select class="form-select" name="genre" required>
+                {% for genre in genres %}
+                <option value="{{ genre.id }}" {% if book.genre_id == genre.id %}selected{% endif %}>{{ genre.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <input type="number" class="form-control" placeholder="Год написания" name="year" value="{{ book.year or '' }}" required>
+        </div>
+        <div class="mb-3">
+            <input type="text" class="form-control" placeholder="Автор" name="author" value="{{ book.author or '' }}" required>
+        </div>
+        <div class="mb-3">
+            <input type="number" class="form-control" placeholder="Объем в страницах" name="volume" value="{{ book.volume or '' }}" required>
+        </div>
+        <div class="mb-3">
+            <textarea class="form-control" placeholder="Описание" name="description" rows="3" required>{{ book.description or '' }}</textarea>
+        </div>
+        <div class="mb-3">
+            <input type="text" class="form-control" placeholder="Издательство" name="publishing" value="{{ book.publishing or '' }}" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+    </form>
+{% endmacro %}
+
+{% macro form_review(book_id) %}
+    <form method="POST" action="{{ url_for('add_review', book_id=book_id) }}">
+            <div class="mb-3">
+                <label for="grade" class="form-label">Оценка</label>
+                <select class="form-select" name="grade" required>
+                    <option value="5">Отлично</option>
+                    <option value="4">Хорошо</option>
+                    <option value="3">Удовлетворительно</option>
+                    <option value="2">Неудовлетворительно</option>
+                    <option value="1">Плохо</option>
+                    <option value="0">Ужасно</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="text" class="form-label">Текст рецензии</label>
+                <textarea class="form-control" placeholder="Текст рецензии" name="text" rows="5" required></textarea>
+            </div>
+            <input type="hidden" name="book_id" value="{{ book_id }}">
+            <button type="submit" class="btn btn-primary">Сохранить рецензию</button>
+    </form>
+{% endmacro %}

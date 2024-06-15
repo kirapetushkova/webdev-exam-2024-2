@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% import "form.html" as macros %}
+{% block content %}
+<div class="container">
+    <h1>{{ book.title }}</h1>
+    <div class="row">
+        <div class="col-md-4">
+            {% if book.cover_filename %}
+            <img src="{{ url_for('static', filename='images/' ~ book.cover_filename) }}" alt="{{ book.title }}" class="img-fluid">
+            {% endif %}
+        </div>
+        <div class="col-md-8">
+            <p><strong>Автор:</strong> {{ book.author }}</p>
+            <p><strong>Издательство:</strong> {{ book.publishing }}</p>
+            <p><strong>Год:</strong> {{ book.year }}</p>
+            <p><strong>Объем:</strong> {{ book.volume }} страниц</p>
+            <p><strong>Жанр(ы):</strong> {{ book.genres }}</p>
+            <div>
+                <strong>Описание:</strong>
+                <div>{{ book.description | safe }}</div>
+            </div>
+        </div>
+    </div>
+    <h3>Рецензии</h3>
+    <div class="reviews">
+        {% for review in reviews %}
+        <div class="review">
+            <p><strong>Пользователь:</strong> {{ review.user }}</p>
+            <p><strong>Оценка:</strong> {{ review.grade }}</p>
+            <p>{{ review.text }}</p>
+            {% if current_user.is_authenticated %}
+                {% if current_user.id == review.user_id or current_user.is_moderator or current_user.is_admin %}
+                    <form action="{{ url_for('delete_review', book_id=book.id, review_id=review.id) }}" method="post">
+                        <input type="hidden" name="_method" value="DELETE">
+                        <button type="submit" class="btn btn-danger">Удалить</button>
+                    </form>
+                {% endif %}
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <hr>
+    {% if current_user.is_authenticated %}
+        {% if user_review %}
+            <h3>Ваша рецензия</h3>
+            <div class="review">
+                <p><strong>Оценка:</strong> {{ user_review.grade }}</p>
+                <p>{{ user_review.text }}</p>
+                <form action="{{ url_for('delete_review', book_id=book.id, review_id=user_review.id) }}" method="post">
+                    <input type="hidden" name="_method" value="DELETE">
+                    <button type="submit" class="btn btn-danger">Удалить</button>
+                </form>
+            </div>
+        {% else %}
+            <h3>Добавить рецензию</h3>
+            {{ macros.form_review(book.id) | safe }}
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}

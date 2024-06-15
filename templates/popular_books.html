@@ -1,0 +1,14 @@
+<div class="container">
+    <h2>Популярные книги</h2>
+    <ul>
+        {% if popular_books %}
+            {% for book in popular_books %}
+            <li>
+                <a href="{{ url_for('view_book', book_id=book.id) }}">{{ book.title }}</a> ({{ book.view_count }} просмотров)
+            </li>
+            {% endfor %}
+        {% else %}
+            <li>Нет популярных книг для отображения</li>
+        {% endif %}
+    </ul>
+</div>

@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% import 'pagination.html' as macros %}
+
+{% block content %}
+<div class="container">
+    <h1>Список книг</h1>
+
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Название</th>
+                    <th>Жанр(ы)</th>
+                    <th>Год</th>
+                    <th>Средняя оценка</th>
+                    <th>Количество рецензий</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for book in books %}
+                <tr>
+                    <td><a href="{{ url_for('view_book', book_id=book.id) }}">{{ book.title }}</a></td>
+                    <td>{{ book.genres }}</td>
+                    <td>{{ book.year }}</td>
+                    <td>{% if book.average_grade %}
+                            <p>Средняя оценка: {{ book.average_grade }}</p>
+                        {% else %}
+                            <p>Нет оценок</p>
+                        {% endif %}</td>
+                    <td>{% if book.review_count > 0 %}
+                            {{ book.review_count }}
+                        {% else %}
+                            Нет рецензий
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <a href="{{ url_for('view_book', book_id=book.id) }}" class="btn btn-primary btn-sm">Просмотр</a>
+                            {% if current_user.is_authenticated %}
+                                {% if current_user.role == 1 %}
+                                    <a href="{{ url_for('edit_book', book_id=book.id) }}" class="btn btn-warning btn-sm">Редактирование</a>
+                                    <button class="btn btn-danger btn-sm delete-btn" data-book-id="{{ book.id }}" data-book-title="{{ book.title }}">Удаление</button>
+                                {% elif current_user.role == 2 %}
+                                    <a href="{{ url_for('edit_book', book_id=book.id) }}" class="btn btn-warning btn-sm">Редактирование</a>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+    {{ macros.pagination(total_pages, current_page) }}
+
+
+    {% if current_user.is_authenticated and current_user.role == 1 %}
+        <a href="{{ url_for('add_book') }}" class="btn btn-success">Добавить книгу</a>
+    {% endif %}
+
+
+    {% include 'popular_books.html' %}
+
+
+    {% if recently_viewed_books %}
+    <div class="recently-viewed">
+        <h2>Недавно просмотренные книги</h2>
+        <ul>
+            {% for book in recently_viewed_books %}
+            <li>
+                <a href="{{ url_for('view_book', book_id=book.id) }}">{{ book.title }}</a> 
+                ({{ book.view_date.strftime('%Y-%m-%d %H:%M') }})
+            </li>
+            {% else %}
+            <li>Нет недавно просмотренных книг</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <h4>Удаление книги</h4>
+            <p id="deleteMessage"></p>
+            <button id="confirmDeleteBtn" class="btn btn-danger">Да</button>
+            <button id="cancelDeleteBtn" class="btn btn-secondary">Нет</button>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/deletebook.js') }}"></script>
+{% endblock %}

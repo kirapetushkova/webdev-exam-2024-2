@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Статистика</h1>
+    <ul class="nav nav-tabs" id="adminStatisticsTab" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="user-log-tab" data-toggle="tab" href="#user-log" role="tab" aria-controls="user-log" aria-selected="true">Журнал действий пользователей</a>
+        </li>
+    </ul>
+    <div class="tab-content" id="adminStatisticsTabContent">
+        <div class="tab-pane fade show active" id="user-log" role="tabpanel" aria-labelledby="user-log-tab">
+            <h2>Журнал действий пользователей</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>№</th>
+                        <th>ФИО пользователя</th>
+                        <th>Название просмотренной книги</th>
+                        <th>Дата и время просмотра</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in user_log %}
+                    <tr>
+                        <td>{{ loop.index + (user_current_page - 1) * 10 }}</td>
+                        <td>{{ log.full_name }}</td>
+                        <td>{{ log.book_title }}</td>
+                        <td>{{ log.created_at }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <nav>
+                <ul class="pagination">
+                    {% if user_current_page > 1 %}
+                    <li class="page-item"><a class="page-link" href="{{ url_for('statistic.admin_statistics', user_page=user_current_page-1) }}#user-log">Предыдущая</a></li>
+                    {% endif %}
+                    {% for page in range(1, user_total_pages + 1) %}
+                    <li class="page-item {% if page == user_current_page %}active{% endif %}"><a class="page-link" href="{{ url_for('statistic.admin_statistics', user_page=page) }}#user-log">{{ page }}</a></li>
+                    {% endfor %}
+                    {% if user_current_page < user_total_pages %}
+                    <li class="page-item"><a class="page-link" href="{{ url_for('statistic.admin_statistics', user_page=user_current_page+1) }}#user-log">Следующая</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        
+    </div>
+</div>
+{% endblock %}
